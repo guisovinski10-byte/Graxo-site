@@ -1,911 +1,1062 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Graxo - Transforme Sua Oficina</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0a0a0a;
-      --bg-light: #151515;
-      --card: #111;
-      --primary: #ff5e1e;
-      --primary-dark: #cc4a14;
-      --text: #fff;
-      --text-sec: #a0a0a0;
-      --red: #ff4444;
-      --green: #44ff44;
-      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-      transition: background 1s var(--ease);
-    }
-
-    body.transformed {
-      --bg: var(--bg-light);
-      background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-light) 70%, #2a1a10 100%);
-    }
-
-    section {
-      min-height: 100vh;
-      padding: clamp(1rem, 5vw, 4rem) 1rem;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      position: relative;
-    }
-
-    /* Counter */
-    .counter-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background: rgba(10,10,10, 0.95);
-      backdrop-filter: blur(20px);
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 0.5rem;
-      font-weight: 800;
-      font-size: clamp(1.2rem, 4vw, 2rem);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
-
-    .counter-prefix {
-      font-size: 0.8em;
-      color: var(--text-sec);
-      font-weight: 500;
-    }
-
-    .counter-status {
-      color: var(--red);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 0.9em;
-    }
-
-    .counter-value {
-      font-size: 1.3em;
-      min-width: 120px;
-      text-align: right;
-    }
-
-    .counter-suffix {
-      font-size: 0.8em;
-      color: var(--text-sec);
-    }
-
-    .counter-container.transformed .counter-status {
-      color: var(--green);
-    }
-
-    .counter-value {
-      animation: glow 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes glow {
-      from {
-        text-shadow: 0 0 10px currentColor20;
-      }
-      to {
-        text-shadow: 0 0 30px currentColor40, 0 0 40px currentColor20;
-      }
-    }
-
-    /* Section 1: Atentado */
-    .phrases {
-      max-width: 800px;
-    }
-
-    .phrase {
-      font-size: clamp(1.5rem, 8vw, 4rem);
-      font-weight: 800;
-      line-height: 1.1;
-      margin: 0 0 clamp(1rem, 3vw, 2rem);
-      opacity: 0;
-      transform: scale(0.8) translateY(20px);
-    }
-
-    /* Section 2: Calculadora */
-    .question {
-      margin-bottom: clamp(2rem, 8vw, 4rem);
-    }
-
-    .question h3 {
-      font-size: clamp(1.2rem, 4vw, 2rem);
-      font-weight: 700;
-      margin: 0 0 1.5rem;
-      color: var(--text);
-    }
-
-    .options {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 1rem;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    .option-btn {
-      padding: 1rem 0.5rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border: 2px solid var(--card);
-      background: var(--card);
-      color: var(--text);
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s var(--ease);
-    }
-
-    .option-btn:hover {
-      border-color: var(--primary);
-      background: rgba(255,94,30,0.1);
-      transform: translateY(-2px);
-    }
-
-    .option-btn.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #000;
-      box-shadow: 0 10px 30px rgba(255,94,30,0.4);
-      transform: scale(1.05);
-    }
-
-    .teaser {
-      font-size: 1.2rem;
-      color: var(--text-sec);
-      font-weight: 500;
-    }
-
-    /* Section 3: Transição */
-    .chaos-container {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .paper {
-      position: absolute;
-      width: clamp(30px, 8vw, 60px);
-      height: 60px;
-      background: linear-gradient(45deg, var(--primary), #ff8e5e);
-      opacity: 0.4;
-      border-radius: 4px;
-      transform-origin: center;
-      transition: all 1.5s var(--ease-bounce);
-    }
-
-    .paper:nth-child(1) { top: 10%; left: 10%; --rot: -45deg; transform: rotate(var(--rot)) scale(0.4) translate(50px, 100px); }
-    .paper:nth-child(2) { top: 20%; right: 15%; --rot: 30deg; transform: rotate(var(--rot)) scale(0.6) translate(-80px, 50px); }
-    .paper:nth-child(3) { bottom: 30%; left: 20%; --rot: -20deg; transform: rotate(var(--rot)) scale(0.3) translate(30px, -120px); }
-    .paper:nth-child(4) { bottom: 10%; right: 10%; --rot: 60deg; transform: rotate(var(--rot)) scale(0.5) translate(-60px, 80px); }
-
-    .chaos-container.organized .paper:nth-child(1) { transform: rotate(0) scale(1) translate(0,0); top: 20%; left: 20%; opacity: 0.8; width: 80px; height: 40px; }
-    .chaos-container.organized .paper:nth-child(2) { transform: rotate(0) scale(1) translate(0,0); top: 20%; right: 20%; opacity: 0.8; width: 40px; height: 80px; }
-    .chaos-container.organized .paper:nth-child(3) { transform: rotate(0) scale(1) translate(0,0); bottom: 40%; left: 20%; opacity: 0.8; width: 80px; height: 40px; }
-    .chaos-container.organized .paper:nth-child(4) { transform: rotate(0) scale(1) translate(0,0); bottom: 20%; right: 20%; opacity: 0.8; width: 40px; height: 80px; }
-
-    /* Section 4: Dashboard */
-    .dashboard {
-      max-width: 1000px;
-      width: 100%;
-    }
-
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-
-    .metric {
-      background: var(--card);
-      padding: 1.5rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
-
-    .metric-label {
-      font-size: 0.9rem;
-      color: var(--text-sec);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-
-    .metric-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    .os-list {
-      list-style: none;
-      padding: 0;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .os-item {
-      background: var(--card);
-      padding: 1rem 1.5rem;
-      margin: 0.5rem 0;
-      border-radius: 12px;
-      opacity: 0;
-      transform: translateX(-30px);
-      transition: all 0.6s var(--ease);
-    }
-
-    .os-item.animate {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .live-text {
-      font-size: 1.1rem;
-      color: var(--text-sec);
-      margin: 2rem 0;
-      font-style: italic;
-    }
-
-    .cta-btn {
-      background: var(--primary);
-      color: #000;
-      padding: 1.2rem 3rem;
-      font-size: 1.2rem;
-      font-weight: 700;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      transition: all 0.3s var(--ease);
-      box-shadow: 0 15px 40px rgba(255,94,30,0.4);
-      animation: pulse-btn 2s infinite;
-    }
-
-    .cta-btn:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 20px 50px rgba(255,94,30,0.6);
-    }
-
-    @keyframes pulse-btn {
-      0%, 100% { box-shadow: 0 15px 40px rgba(255,94,30,0.4); }
-      50% { box-shadow: 0 15px 40px rgba(255,94,30,0.6); }
-    }
-
-    /* Section 5: Prova Social */
-    .testimonials {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      max-width: 800px;
-      width: 100%;
-    }
-
-    @media (min-width: 600px) {
-      .testimonials {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      }
-    }
-
-    .testimonial {
-      background: var(--card);
-      padding: 2rem;
-      border-radius: 20px;
-      box-shadow: 0 15px 50px rgba(0,0,0,0.4);
-      transition: transform 0.3s var(--ease);
-    }
-
-    .testimonial:hover {
-      transform: translateY(-10px);
-    }
-
-    .avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      margin: 0 auto 1rem;
-      background: linear-gradient(135deg, hsl(0,70%,50%), hsl(20,70%,50%));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.5rem;
-    }
-
-    .testimonial:nth-child(1) .avatar { --hue: 0; background: linear-gradient(135deg, hsl(0,70%,50%), hsl(20,70%,50%)); }
-    .testimonial:nth-child(2) .avatar { --hue: 200; background: linear-gradient(135deg, hsl(200,70%,50%), hsl(220,70%,50%)); }
-    .testimonial:nth-child(3) .avatar { --hue: 120; background: linear-gradient(135deg, hsl(120,70%,50%), hsl(140,70%,50%)); }
-
-    .testimonial h4 {
-      margin: 0 0 0.5rem;
-      font-weight: 700;
-    }
-
-    .testimonial p {
-      color: var(--text-sec);
-      margin: 0 0 1.5rem;
-      font-size: 1.1rem;
-    }
-
-    .mini-graph {
-      display: flex;
-      align-items: end;
-      gap: 1rem;
-      justify-content: center;
-    }
-
-    .bar-group {
-      display: flex;
-      gap: 0.3rem;
-      height: 40px;
-    }
-
-    .bar {
-      width: 20px;
-      background: var(--primary);
-      border-radius: 4px 4px 0 0;
-      transition: height 1s var(--ease);
-    }
-
-    .bar:before {
-      height: 30%;
-      content: '';
-      display: block;
-    }
-
-    .bar:after {
-      height: 85%;
-      content: '';
-      display: block;
-      background: var(--green);
-    }
-
-    .bar-label {
-      font-size: 0.8rem;
-      color: var(--text-sec);
-      margin-left: 1rem;
-    }
-
-    /* Section 6: Produto */
-    #produto {
-      max-width: 700px;
-    }
-
-    .features {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .feature {
-      background: var(--card);
-      margin: 1rem 0;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    .feature-title {
-      padding: 1.5rem;
-      font-size: 1.3rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.3s var(--ease);
-    }
-
-    .feature-title:hover {
-      background: rgba(255,94,30,0.1);
-    }
-
-    .feature-desc {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      background: rgba(255,94,30,0.05);
-      transition: all 0.8s var(--ease);
-      padding: 0 1.5rem;
-    }
-
-    .feature-desc.expanded {
-      max-height: 200px;
-      opacity: 1;
-      padding: 1.5rem;
-    }
-
-    .feature-desc p {
-      margin: 0;
-      color: var(--text-sec);
-      font-size: 1.1rem;
-    }
-
-    /* Section 7: Encerramento */
-    #encerramento {
-      background: linear-gradient(135deg, var(--primary-dark)20, var(--primary)40);
-    }
-
-    #encerramento h2 {
-      font-size: clamp(2rem, 8vw, 4rem);
-      font-weight: 800;
-      margin: 0 0 1rem;
-    }
-
-    #encerramento .subtitle {
-      font-size: 1.3rem;
-      color: var(--text-sec);
-      margin: 0 0 2rem;
-      max-width: 600px;
-    }
-
-    .cta-form {
-      display: flex;
-      max-width: 400px;
-      margin: 0 auto 2rem;
-      gap: 1rem;
-      flex-direction: column;
-    }
-
-    @media (min-width: 500px) {
-      .cta-form {
-        flex-direction: row;
-      }
-    }
-
-    .cta-form input {
-      flex: 1;
-      padding: 1.2rem;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 50px;
-      background: rgba(255,255,255,0.1);
-      color: var(--text);
-      backdrop-filter: blur(10px);
-    }
-
-    .cta-form input::placeholder {
-      color: var(--text-sec);
-    }
-
-    .fine-print {
-      font-size: 0.9rem;
-      color: var(--text-sec);
-      max-width: 500px;
-      margin: 1rem auto 0;
-    }
-
-    .footer {
-      padding: 2rem 1rem;
-      text-align: center;
-      border-top: 1px solid var(--card);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .logo {
-      font-size: 2rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--primary), #ff8e5e);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0 0 0.5rem;
-    }
-
-    .social {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-sec);
-      text-decoration: none;
-      font-size: 1rem;
-    }
-
-    .insta-icon {
-      width: 24px;
-      height: 24px;
-      fill: var(--primary);
-    }
-
-    /* Toast */
-    #toast {
-      position: fixed;
-      bottom: -100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--primary);
-      color: #000;
-      padding: 1rem 2rem;
-      border-radius: 50px;
-      font-weight: 600;
-      transition: all 0.4s var(--ease);
-      z-index: 2000;
-    }
-
-    #toast.show {
-      bottom: 2rem;
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-      .counter-container {
-        padding: 1rem;
-        flex-wrap: wrap;
-        gap: 0.25rem;
-        font-size: clamp(1rem, 3vw, 1.5rem);
-      }
-
-      .counter-value {
-        font-size: 1.5em;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graxo - Gestão Financeira para Oficinas Mecânicas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Custom Properties - Design System */
+        :root {
+            --bg-primary: #0b0b0b;
+            --surface: #1a1a1a;
+            --surface-hover: #252525;
+            --surface-elevated: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            --accent: #ff5e1e;
+            --accent-hover: #e54a0e;
+            --accent-gradient: linear-gradient(135deg, #ff5e1e, #ff8a50);
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-hover: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 20px 40px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 30px 60px rgba(0, 0, 0, 0.5);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --transition: all 0.3s ease-out;
+            --spacing-xs: 12px;
+            --spacing-sm: 24px;
+            --spacing-md: 48px;
+            --spacing-lg: 80px;
+            --spacing-xl: 120px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes countUp {
+            from { counter-increment: counter 0; }
+        }
+
+        .animate-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .animate-fade-in.animate {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .stagger { transition-delay: calc(0.1s * var(--stagger)); }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: var(--glass);
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+            padding: var(--spacing-sm) var(--spacing-lg);
+        }
+
+        .navbar.scrolled {
+            background: var(--glass-hover);
+            backdrop-filter: blur(30px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .cta-btn {
+            background: var(--accent);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--surface-elevated);
+            flex-direction: column;
+            padding: var(--spacing-md);
+            gap: var(--spacing-sm);
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-lg);
+            gap: 4rem;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--glass);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+            max-width: 500px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            padding: 12px 24px;
+        }
+
+        .cta-secondary:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-secondary:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        .hero-mockup {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mockup-laptop {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+            border-radius: var(--radius-lg);
+            position: relative;
+            box-shadow: var(--shadow-lg);
+            padding: 40px 40px 60px;
+        }
+
+        .mockup-screen {
+            width: 100%;
+            height: 100%;
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mockup-chart {
+            position: absolute;
+            top: 20%;
+            left: 10%;
+            right: 10%;
+            bottom: 20%;
+        }
+
+        /* Logos */
+        .logos {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: var(--spacing-lg);
+            opacity: 0.6;
+        }
+
+        .logo-placeholder {
+            height: 40px;
+            background: var(--surface);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+        }
+
+        /* Section General */
+        section {
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        @media (min-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto var(--spacing-md) auto;
+            fill: var(--accent);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        /* Metrics */
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .metrics {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .metric {
+            position: relative;
+        }
+
+        .metric-value {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 800;
+            color: var(--accent);
+            display: block;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        @media (min-width: 768px) {
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .testimonials-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .testimonial-card {
+            background: var(--surface);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto var(--spacing-md) auto;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .quote {
+            font-style: italic;
+            margin-bottom: var(--spacing-sm);
+            font-size: 1.1rem;
+        }
+
+        .author {
+            font-weight: 600;
+        }
+
+        .cargo {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Pricing */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        @media (min-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .price-card {
+            background: var(--surface);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+        }
+
+        .price-card.popular {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md);
+            transform: scale(1.05);
+        }
+
+        .popular-tag {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 4px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .price-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .price-period {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .features-list li:last-child {
+            border-bottom: none;
+        }
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent);
+        }
+
+        /* CTA Final */
+        .cta-final {
+            background: var(--accent-gradient);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            text-align: center;
+            margin: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .cta-final form {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .email-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 16px var(--spacing-md);
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .email-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--surface-elevated);
+            padding: var(--spacing-xl) var(--spacing-lg);
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        @media (min-width: 768px) {
+            .footer-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .footer-section h3 {
+            margin-bottom: var(--spacing-md);
+            font-weight: 600;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: var(--accent);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: var(--spacing-lg);
+            color: var(--text-muted);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            transform: translateX(400px);
+            transition: var(--transition);
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: var(--spacing-lg) var(--spacing-md);
+            }
+
+            .navbar {
+                padding: var(--spacing-md) var(--spacing-md);
+            }
+
+            section {
+                padding: var(--spacing-lg) var(--spacing-md);
+            }
+
+            .cta-group {
+                justify-content: center;
+            }
+        }
+
+        /* SVG Icons Styles */
+        svg {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-  <div class="counter-container">
-    <span class="counter-prefix">VOCÊ ESTÁ</span>
-    <span class="counter-status">PERDENDO</span>
-    <span class="counter-value" data-current="0">R$ 0</span>
-    <span class="counter-suffix">POR MÊS</span>
-  </div>
-
-  <section id="atentado">
-    <div class="phrases">
-      <h2 class="phrase">Você sabia que...</h2>
-      <h2 class="phrase">42% dos serviços agendados em oficinas mecânicas</h2>
-      <h2 class="phrase">NUNCA SÃO FATURADOS?</h2>
-    </div>
-  </section>
-
-  <section id="calculadora">
-    <div class="question" id="cars-q">
-      <h3>Quantos carros passam no seu mês?</h3>
-      <div class="options">
-        <button class="option-btn" data-cars="10-30">10-30</button>
-        <button class="option-btn" data-cars="30-60">30-60</button>
-        <button class="option-btn" data-cars="60-100">60-100</button>
-        <button class="option-btn" data-cars="100+">100+</button>
-      </div>
-    </div>
-    <div class="question" id="ticket-q">
-      <h3>Qual o ticket médio dos seus serviços?</h3>
-      <div class="options">
-        <button class="option-btn" data-ticket="150">R$ 150</button>
-        <button class="option-btn" data-ticket="300">R$ 300</button>
-        <button class="option-btn" data-ticket="500">R$ 500</button>
-        <button class="option-btn" data-ticket="800">R$ 800+</button>
-      </div>
-    </div>
-    <p class="teaser">E se eu te dissesse que isso pode mudar em 30 segundos?</p>
-  </section>
-
-  <section id="transicao">
-    <div class="chaos-container">
-      <div class="paper"></div>
-      <div class="paper"></div>
-      <div class="paper"></div>
-      <div class="paper"></div>
-    </div>
-  </section>
-
-  <section id="dashboard">
-    <div class="dashboard">
-      <div class="metrics">
-        <div class="metric">
-          <span class="metric-label">Receita</span>
-          <span class="metric-value" data-target="152340">R$ 0</span>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                Graxo
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Funcionalidades</a></li>
+                <li><a href="#pricing">Preços</a></li>
+                <li><a href="#testimonials">Depoimentos</a></li>
+                <li><a href="#blog">Blog</a></li>
+                <li><a href="#cta" class="cta-btn">Começar grátis</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="mobile-menu" id="mobileMenu">
+                <a href="#features">Funcionalidades</a>
+                <a href="#pricing">Preços</a>
+                <a href="#testimonials">Depoimentos</a>
+                <a href="#blog">Blog</a>
+                <a href="#cta" class="cta-btn">Começar grátis</a>
+            </div>
         </div>
-        <div class="metric">
-          <span class="metric-label">OS Fechadas</span>
-          <span class="metric-value" data-target="245">0</span>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero animate-fade-in" id="hero">
+        <div class="hero-content">
+            <div class="badge">🏆 Mais de 200 oficinas ativas no Brasil</div>
+            <h1 class="hero-title">A gestão financeira que sua oficina merece</h1>
+            <p class="hero-subtitle">Controle de OS, clientes e finanças em um só lugar. Sem planilhas, sem caderno, sem perder dinheiro.</p>
+            <div class="cta-group">
+                <a href="#cta" class="cta-btn">Começar grátis</a>
+                <a href="#demo" class="cta-btn cta-secondary">Ver demonstração <span class="arrow">→</span></a>
+            </div>
         </div>
-        <div class="metric">
-          <span class="metric-label">Clientes</span>
-          <span class="metric-value" data-target="189">0</span>
+        <div class="hero-mockup">
+            <div class="mockup-laptop">
+                <div class="mockup-screen">
+                    <svg class="mockup-chart" viewBox="0 0 300 200">
+                        <rect x="20" y="120" width="40" height="80" fill="#ff5e1e" rx="4"/>
+                        <rect x="70" y="80" width="40" height="120" fill="#ff8a50" rx="4"/>
+                        <rect x="120" y="100" width="40" height="100" fill="#ff5e1e" rx="4"/>
+                        <rect x="170" y="60" width="40" height="140" fill="#ff8a50" rx="4"/>
+                        <rect x="220" y="90" width="40" height="110" fill="#ff5e1e" rx="4"/>
+                    </svg>
+                </div>
+            </div>
         </div>
-        <div class="metric">
-          <span class="metric-label">Margem</span>
-          <span class="metric-value" data-target="32">0%</span>
+        <div class="logos">
+            <div class="logo-placeholder">Oficina A</div>
+            <div class="logo-placeholder">Mecânica B</div>
+            <div class="logo-placeholder">Auto C</div>
+            <div class="logo-placeholder">Veículos D</div>
         </div>
-      </div>
-      <ul class="os-list">
-        <li class="os-item">OS #123 - Fiat Uno - Troca de óleo ✅</li>
-        <li class="os-item">OS #124 - VW Gol - Alinhamento ✅</li>
-        <li class="os-item">OS #125 - Honda Civic - Freios ✅</li>
-        <li class="os-item">OS #126 - Ford Ka - Revisão ✅</li>
-        <li class="os-item">OS #127 - Chevrolet Onix - Pneus ✅</li>
-      </ul>
-      <p class="live-text">Enquanto você lê isso, uma oficina está faturando com Graxo</p>
-      <button class="cta-btn" onclick="scrollToCTA()">QUERO MEU RESULTADO →</button>
-    </div>
-  </section>
+    </section>
 
-  <section id="prova-social">
-    <div class="testimonials">
-      <div class="testimonial">
-        <div class="avatar">RB</div>
-        <h4>Ricardo Bento</h4>
-        <p>Recuperei R$ 2.340 em inadimplência no primeiro mês</p>
-        <div class="mini-graph">
-          <div class="bar-group">
-            <div class="bar bar-before"></div>
-            <div class="bar bar-after"></div>
-          </div>
-          <span class="bar-label">Antes / Depois</span>
+    <!-- Features -->
+    <section id="features" class="animate-fade-in">
+        <div class="container">
+            <h2>Funcionalidades que transformam sua oficina</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <svg class="feature-icon" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <h3 class="feature-title">Ordens de Serviço</h3>
+                    <p>Controle completo com status, valores e histórico. Cada serviço vira cobrança.</p>
+                </div>
+                <div class="feature-card">
+                    <svg class="feature-icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <h3 class="feature-title">Saúde Financeira</h3>
+                    <p>Dashboard em tempo real com receitas, despesas e margem de lucro.</p>
+                </div>
+                <div class="feature-card">
+                    <svg class="feature-icon" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+                    </svg>
+                    <h3 class="feature-title">Radar de Inadimplência</h3>
+                    <p>Identifique clientes pendentes e recupere valores em atraso.</p>
+                </div>
+                <div class="feature-card">
+                    <svg class="feature-icon" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5-8l-3.5 3.5 1.414 1.414L14 12l4.707 4.707 1.414-1.414L14 11z"/>
+                    </svg>
+                    <h3 class="feature-title">Orçamentos Rápidos</h3>
+                    <p>Crie e envie orçamentos pelo WhatsApp em 30 segundos.</p>
+                </div>
+                <div class="feature-card">
+                    <svg class="feature-icon" viewBox="0 0 24 24">
+                        <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                    </svg>
+                    <h3 class="feature-title">Agenda Inteligente</h3>
+                    <p>Gerencie horários sem conflitos e reduza ociosidade.</p>
+                </div>
+                <div class="feature-card">
+                    <svg class="feature-icon" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.11 0-1.99.89-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                    </svg>
+                    <h3 class="feature-title">Relatórios Avançados</h3>
+                    <p>Gráficos mensais de receita para decisões baseadas em dados.</p>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="testimonial">
-        <div class="avatar">CS</div>
-        <h4>Carlos Silva</h4>
-        <p>De 12 para 45 OS por mês</p>
-        <div class="mini-graph">
-          <div class="bar-group">
-            <div class="bar bar-before"></div>
-            <div class="bar bar-after"></div>
-          </div>
-          <span class="bar-label">Antes / Depois</span>
+    </section>
+
+    <!-- Metrics -->
+    <section class="metrics-section animate-fade-in">
+        <div class="container">
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-value" data-target="2.3">0</span>
+                    <span class="metric-label">R$M recuperados em inadimplência</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value" data-target="12.5">0</span>
+                    <span class="metric-label">K OS emitidas</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value" data-target="200">0</span>
+                    <span class="metric-label">+ oficinas</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-value" data-target="98">0</span>
+                    <span class="metric-label">% satisfação</span>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="testimonial">
-        <div class="avatar">JC</div>
-        <h4>Juliana Costa</h4>
-        <p>Margem de lucro subiu de 8% para 32%</p>
-        <div class="mini-graph">
-          <div class="bar-group">
-            <div class="bar bar-before"></div>
-            <div class="bar bar-after"></div>
-          </div>
-          <span class="bar-label">Antes / Depois</span>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="animate-fade-in">
+        <div class="container">
+            <h2>Depoimentos de quem já usa</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="avatar">RB</div>
+                    <p class="quote">"Recuperamos R$ 2.340 em inadimplência no primeiro mês"</p>
+                    <div class="author">Ricardo Bento</div>
+                    <div class="cargo">Proprietário, Oficina do Zé</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="avatar">CS</div>
+                    <p class="quote">"De 12 para 45 OS por mês em apenas 60 dias"</p>
+                    <div class="author">Carlos Silva</div>
+                    <div class="cargo">Sócio, Auto Mecânica Silva</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="avatar">JC</div>
+                    <p class="quote">"Margem de lucro subiu de 8% para 32% em 3 meses"</p>
+                    <div class="author">Juliana Costa</div>
+                    <div class="cargo">CEO, Costa Veículos</div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="produto">
-    <ul class="features">
-      <li class="feature">
-        <div class="feature-title">OS que não deixam dinheiro na mesa</div>
-        <div class="feature-desc">
-          <p>Cada serviço vira cobrança. Cliente não escapa.</p>
+    <!-- Pricing -->
+    <section id="pricing" class="animate-fade-in">
+        <div class="container">
+            <h2>Escolha o plano ideal</h2>
+            <div class="pricing-grid">
+                <div class="price-card">
+                    <h3>GRÁTIS</h3>
+                    <div class="price-value">R$ 0</div>
+                    <div class="price-period">mês</div>
+                    <ul class="features-list">
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Até 50 clientes</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> OS ilimitadas</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Dashboard</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Suporte email</li>
+                    </ul>
+                    <a href="#cta" class="cta-btn">Começar grátis</a>
+                </div>
+                <div class="price-card popular">
+                    <div class="popular-tag">MAIS POPULAR</div>
+                    <h3>PRO</h3>
+                    <div class="price-value">R$ 47</div>
+                    <div class="price-period">mês</div>
+                    <ul class="features-list">
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Clientes ilimitados</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Inadimplência</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Relatórios</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> WhatsApp</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Suporte prioritário</li>
+                    </ul>
+                    <a href="#cta" class="cta-btn">Começar agora</a>
+                </div>
+                <div class="price-card">
+                    <h3>PREMIUM</h3>
+                    <div class="price-value">R$ 97</div>
+                    <div class="price-period">mês</div>
+                    <ul class="features-list">
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Tudo do Pro</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Múltiplas unidades</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> API</li>
+                        <li><svg class="checkmark" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Gerente de sucesso</li>
+                    </ul>
+                    <a href="#cta" class="cta-btn">Começar agora</a>
+                </div>
+            </div>
         </div>
-      </li>
-      <li class="feature">
-        <div class="feature-title">Clientes que não somem</div>
-        <div class="feature-desc">
-          <p>Telefone, placa, histórico. Tudo salvo. Nunca mais perca um contato.</p>
+    </section>
+
+    <!-- CTA Final -->
+    <section id="cta" class="cta-final animate-fade-in">
+        <div class="container">
+            <h2>Pronto para transformar sua oficina?</h2>
+            <p>Junte-se a mais de 200 oficinas que já pararam de perder dinheiro.</p>
+            <form id="ctaForm">
+                <input type="email" class="email-input" placeholder="Digite seu email" required>
+                <button type="submit" class="cta-btn">Começar agora <span class="arrow">→</span></button>
+            </form>
+            <p style="margin-top: var(--spacing-md); color: rgba(255,255,255,0.8); font-size: 0.875rem;">14 dias grátis · Cancela quando quiser · Sem pegadinha</p>
         </div>
-      </li>
-      <li class="feature">
-        <div class="feature-title">Dinheiro que não se perde</div>
-        <div class="feature-desc">
-          <p>Dashboard em tempo real. Você vê cada real entrando e saindo.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer animate-fade-in">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <a href="#" class="logo" style="font-size: 1.25rem;">
+                        <svg style="width: 28px; height: 28px;" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                        </svg>
+                        Graxo
+                    </a>
+                </div>
+                <div class="footer-section">
+                    <h3>Produto</h3>
+                    <ul>
+                        <li><a href="#features">Funcionalidades</a></li>
+                        <li><a href="#pricing">Preços</a></li>
+                        <li><a href="#">Demo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Empresa</h3>
+                    <ul>
+                        <li><a href="#">Sobre</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#">Carreiras</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Suporte</h3>
+                    <ul>
+                        <li><a href="#">Ajuda</a></li>
+                        <li><a href="#">Contato</a></li>
+                        <li><a href="#">Política</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2026 Graxo. Todos os direitos reservados.</p>
+                <p>Feito no Brasil 🇧🇷</p>
+            </div>
         </div>
-      </li>
-      <li class="feature">
-        <div class="feature-title">Orçamentos em 30 segundos</div>
-        <div class="feature-desc">
-          <p>Preenche, envia no WhatsApp. Cliente aprova na hora.</p>
-        </div>
-      </li>
-    </ul>
-  </section>
+    </footer>
 
-  <section id="encerramento" id="cta">
-    <h2>Chega de perder dinheiro no escuro.</h2>
-    <p class="subtitle">Mais de 200 oficinas já pararam de perder dinheiro. A sua pode ser a próxima.</p>
-    <form class="cta-form" id="cta-form">
-      <input type="email" placeholder="Seu email para seu resultado" required>
-      <button type="submit" class="cta-btn">QUERO VER MEU RESULTADO →</button>
-    </form>
-    <p class="fine-print">Sem pegadinha. 14 dias grátis. Cancela quando quiser.</p>
-    <div class="footer">
-      <h1 class="logo">GRAXO</h1>
-      <p>Feito por quem ama oficina</p>
-      <a href="#" class="social" target="_blank">
-        <svg class="insta-icon" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-        Instagram
-      </a>
-    </div>
-  </section>
+    <!-- Toast -->
+    <div class="toast" id="toast">Email enviado com sucesso! Em breve entraremos em contato.</div>
 
-  <div id="toast">Email enviado! Veja seu resultado em instantes. 🚀</div>
+    <script>
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const scroll = window.scrollY;
+            if (scroll > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+            lastScroll = scroll;
+        });
 
-  <script>
-    // Car medias
-    const carMedias = {
-      '10-30': 20,
-      '30-60': 45,
-      '60-100': 80,
-      '100+': 130
-    };
+        // Hamburger Menu
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        hamburger.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
 
-    let selectedCars = null;
-    let selectedTicket = null;
-    let currentLoss = 0;
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    mobileMenu.classList.remove('active');
+                }
+            });
+        });
 
-    // DOM elements
-    const counterValue = document.querySelector('.counter-value');
-    const counterStatus = document.querySelector('.counter-status');
-    const counterContainer = document.querySelector('.counter-container');
-    const phrases = document.querySelectorAll('.phrase');
-    const carBtns = document.querySelectorAll('[data-cars]');
-    const ticketBtns = document.querySelectorAll('[data-ticket]');
-    const form = document.getElementById('cta-form');
-    const toast = document.getElementById('toast');
-
-    // Animate phrases on load
-    phrases.forEach((phrase, i) => {
-      setTimeout(() => {
-        phrase.style.transition = '0.8s var(--ease)';
-        phrase.style.opacity = '1';
-        phrase.style.transform = 'scale(1) translateY(0)';
-      }, i * 1000 + 500);
-    });
-
-    // Calculator buttons
-    carBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        carBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedCars = btn.dataset.cars;
-        updateLoss();
-      });
-    });
-
-    ticketBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        ticketBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedTicket = parseInt(btn.dataset.ticket);
-        updateLoss();
-      });
-    });
-
-    function updateLoss() {
-      if (selectedCars && selectedTicket) {
-        currentLoss = carMedias[selectedCars] * selectedTicket * 0.42;
-        animateCounter(currentLoss, counterValue);
-      }
-    }
-
-    // Animate counter
-    function animateCounter(target, el = counterValue) {
-      const start = parseFloat(el.dataset.current || '0');
-      const duration = 1200;
-      const startTime = performance.now();
-
-      function step(time) {
-        const progress = Math.min((time - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
-        const value = start + (target - start) * eased;
-        el.textContent = 'R$ ' + Math.floor(value).toLocaleString('pt-BR');
-        el.dataset.current = value;
-
-        if (progress < 1) {
-          requestAnimationFrame(step);
-        } else {
-          el.textContent = 'R$ ' + Math.floor(target).toLocaleString('pt-BR');
-          el.dataset.current = target;
-        }
-      }
-
-      requestAnimationFrame(step);
-    }
-
-    // Scroll observers
-    const dashboardObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          document.body.classList.add('transformed');
-          counterContainer.classList.add('transformed');
-          counterStatus.textContent = 'RECUPERANDO';
-          animateCounter(currentLoss || 12600); // default example
-          chaosContainer.classList.add('organized');
-          animateMetrics();
-          animateOsList();
-          dashboardObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    const featureObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.querySelector('.feature-desc').classList.add('expanded');
-        }
-      });
-    }, { threshold: 0.2 });
-
-    // Chaos container
-    const chaosContainer = document.querySelector('.chaos-container');
-
-    // Metrics animation
-    function animateMetrics() {
-      document.querySelectorAll('.metric-value').forEach(el => {
-        const target = parseFloat(el.dataset.target);
-        const isPercent = el.textContent.includes('%');
-        const animateEl = (val) => {
-          el.textContent = isPercent ? Math.floor(val) + '%' : 'R$ ' + Math.floor(val).toLocaleString('pt-BR');
+        // Scroll Animations with Intersection Observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
         };
-        animateCounter(target, { textContent: 0, animateEl });
-        // Simplified, use same animateCounter adapted
-        let start = 0;
-        const duration = 1500;
-        const startTime = performance.now();
-        function step(time) {
-          const p = Math.min((time - startTime)/duration, 1);
-          const eased = 1 - Math.pow(1 - p, 3);
-          const val = start + (target - start) * eased;
-          if (isPercent) {
-            el.textContent = Math.floor(val) + '%';
-          } else {
-            el.textContent = 'R$ ' + Math.floor(val).toLocaleString('pt-BR');
-          }
-          if (p < 1) requestAnimationFrame(step);
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                    entry.target.style.setProperty('--stagger', index * 0.1);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Animated Counters
+        const counters = document.querySelectorAll('.metric-value');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        counters.forEach(counter => counterObserver.observe(counter));
+
+        function animateCounter(el) {
+            const target = parseFloat(el.getAttribute('data-target'));
+            let current = 0;
+            const increment = target / 100;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                el.textContent = current.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+            }, 20);
         }
-        requestAnimationFrame(step);
-      });
-    }
 
-    // OS list stagger
-    function animateOsList() {
-      const items = document.querySelectorAll('.os-item');
-      items.forEach((item, i) => {
-        setTimeout(() => item.classList.add('animate'), i * 150);
-      });
-    }
-
-    // Observe dashboard
-    dashboardObserver.observe(document.getElementById('dashboard'));
-
-    // Observe features
-    document.querySelectorAll('.feature').forEach(feat => {
-      featureObserver.observe(feat);
-    });
-
-    // CTA scroll
-    function scrollToCTA() {
-      document.getElementById('encerramento').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Form submit
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = form.querySelector('input').value;
-      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-        form.reset();
-      }
-    });
-
-    // Bar heights for testimonials (static CSS pseudo, but enhance)
-    document.querySelectorAll('.bar-before').forEach((bar, i) => {
-      bar.style.height = i === 2 ? '25%' : '30%';
-    });
-    document.querySelectorAll('.bar-after').forEach(bar => {
-      bar.style.height = '85%';
-    });
-  </script>
+        // Email Form
+        const form = document.getElementById('ctaForm');
+        const toast = document.getElementById('toast');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = form.querySelector('.email-input').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailRegex.test(email)) {
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+                form.reset();
+            } else {
+                alert('Por favor, insira um email válido.');
+            }
+        });
+    </script>
 </body>
 </html>
