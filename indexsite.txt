@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graxo - Transforme Sua Oficina</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-light: #151515;
+      --card: #111;
+      --primary: #ff5e1e;
+      --primary-dark: #cc4a14;
+      --text: #fff;
+      --text-sec: #a0a0a0;
+      --red: #ff4444;
+      --green: #44ff44;
+      --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      transition: background 1s var(--ease);
+    }
+
+    body.transformed {
+      --bg: var(--bg-light);
+      background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-light) 70%, #2a1a10 100%);
+    }
+
+    section {
+      min-height: 100vh;
+      padding: clamp(1rem, 5vw, 4rem) 1rem;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    /* Counter */
+    .counter-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(10,10,10, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0.5rem;
+      font-weight: 800;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .counter-prefix {
+      font-size: 0.8em;
+      color: var(--text-sec);
+      font-weight: 500;
+    }
+
+    .counter-status {
+      color: var(--red);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.9em;
+    }
+
+    .counter-value {
+      font-size: 1.3em;
+      min-width: 120px;
+      text-align: right;
+    }
+
+    .counter-suffix {
+      font-size: 0.8em;
+      color: var(--text-sec);
+    }
+
+    .counter-container.transformed .counter-status {
+      color: var(--green);
+    }
+
+    .counter-value {
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px currentColor20;
+      }
+      to {
+        text-shadow: 0 0 30px currentColor40, 0 0 40px currentColor20;
+      }
+    }
+
+    /* Section 1: Atentado */
+    .phrases {
+      max-width: 800px;
+    }
+
+    .phrase {
+      font-size: clamp(1.5rem, 8vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 0 0 clamp(1rem, 3vw, 2rem);
+      opacity: 0;
+      transform: scale(0.8) translateY(20px);
+    }
+
+    /* Section 2: Calculadora */
+    .question {
+      margin-bottom: clamp(2rem, 8vw, 4rem);
+    }
+
+    .question h3 {
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      font-weight: 700;
+      margin: 0 0 1.5rem;
+      color: var(--text);
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .option-btn {
+      padding: 1rem 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 2px solid var(--card);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s var(--ease);
+    }
+
+    .option-btn:hover {
+      border-color: var(--primary);
+      background: rgba(255,94,30,0.1);
+      transform: translateY(-2px);
+    }
+
+    .option-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #000;
+      box-shadow: 0 10px 30px rgba(255,94,30,0.4);
+      transform: scale(1.05);
+    }
+
+    .teaser {
+      font-size: 1.2rem;
+      color: var(--text-sec);
+      font-weight: 500;
+    }
+
+    /* Section 3: Transição */
+    .chaos-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .paper {
+      position: absolute;
+      width: clamp(30px, 8vw, 60px);
+      height: 60px;
+      background: linear-gradient(45deg, var(--primary), #ff8e5e);
+      opacity: 0.4;
+      border-radius: 4px;
+      transform-origin: center;
+      transition: all 1.5s var(--ease-bounce);
+    }
+
+    .paper:nth-child(1) { top: 10%; left: 10%; --rot: -45deg; transform: rotate(var(--rot)) scale(0.4) translate(50px, 100px); }
+    .paper:nth-child(2) { top: 20%; right: 15%; --rot: 30deg; transform: rotate(var(--rot)) scale(0.6) translate(-80px, 50px); }
+    .paper:nth-child(3) { bottom: 30%; left: 20%; --rot: -20deg; transform: rotate(var(--rot)) scale(0.3) translate(30px, -120px); }
+    .paper:nth-child(4) { bottom: 10%; right: 10%; --rot: 60deg; transform: rotate(var(--rot)) scale(0.5) translate(-60px, 80px); }
+
+    .chaos-container.organized .paper:nth-child(1) { transform: rotate(0) scale(1) translate(0,0); top: 20%; left: 20%; opacity: 0.8; width: 80px; height: 40px; }
+    .chaos-container.organized .paper:nth-child(2) { transform: rotate(0) scale(1) translate(0,0); top: 20%; right: 20%; opacity: 0.8; width: 40px; height: 80px; }
+    .chaos-container.organized .paper:nth-child(3) { transform: rotate(0) scale(1) translate(0,0); bottom: 40%; left: 20%; opacity: 0.8; width: 80px; height: 40px; }
+    .chaos-container.organized .paper:nth-child(4) { transform: rotate(0) scale(1) translate(0,0); bottom: 20%; right: 20%; opacity: 0.8; width: 40px; height: 80px; }
+
+    /* Section 4: Dashboard */
+    .dashboard {
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .metric {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    .metric-label {
+      font-size: 0.9rem;
+      color: var(--text-sec);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .os-list {
+      list-style: none;
+      padding: 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .os-item {
+      background: var(--card);
+      padding: 1rem 1.5rem;
+      margin: 0.5rem 0;
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: all 0.6s var(--ease);
+    }
+
+    .os-item.animate {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .live-text {
+      font-size: 1.1rem;
+      color: var(--text-sec);
+      margin: 2rem 0;
+      font-style: italic;
+    }
+
+    .cta-btn {
+      background: var(--primary);
+      color: #000;
+      padding: 1.2rem 3rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s var(--ease);
+      box-shadow: 0 15px 40px rgba(255,94,30,0.4);
+      animation: pulse-btn 2s infinite;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 20px 50px rgba(255,94,30,0.6);
+    }
+
+    @keyframes pulse-btn {
+      0%, 100% { box-shadow: 0 15px 40px rgba(255,94,30,0.4); }
+      50% { box-shadow: 0 15px 40px rgba(255,94,30,0.6); }
+    }
+
+    /* Section 5: Prova Social */
+    .testimonials {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    @media (min-width: 600px) {
+      .testimonials {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      }
+    }
+
+    .testimonial {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+      transition: transform 0.3s var(--ease);
+    }
+
+    .testimonial:hover {
+      transform: translateY(-10px);
+    }
+
+    .avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      background: linear-gradient(135deg, hsl(0,70%,50%), hsl(20,70%,50%));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+
+    .testimonial:nth-child(1) .avatar { --hue: 0; background: linear-gradient(135deg, hsl(0,70%,50%), hsl(20,70%,50%)); }
+    .testimonial:nth-child(2) .avatar { --hue: 200; background: linear-gradient(135deg, hsl(200,70%,50%), hsl(220,70%,50%)); }
+    .testimonial:nth-child(3) .avatar { --hue: 120; background: linear-gradient(135deg, hsl(120,70%,50%), hsl(140,70%,50%)); }
+
+    .testimonial h4 {
+      margin: 0 0 0.5rem;
+      font-weight: 700;
+    }
+
+    .testimonial p {
+      color: var(--text-sec);
+      margin: 0 0 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .mini-graph {
+      display: flex;
+      align-items: end;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .bar-group {
+      display: flex;
+      gap: 0.3rem;
+      height: 40px;
+    }
+
+    .bar {
+      width: 20px;
+      background: var(--primary);
+      border-radius: 4px 4px 0 0;
+      transition: height 1s var(--ease);
+    }
+
+    .bar:before {
+      height: 30%;
+      content: '';
+      display: block;
+    }
+
+    .bar:after {
+      height: 85%;
+      content: '';
+      display: block;
+      background: var(--green);
+    }
+
+    .bar-label {
+      font-size: 0.8rem;
+      color: var(--text-sec);
+      margin-left: 1rem;
+    }
+
+    /* Section 6: Produto */
+    #produto {
+      max-width: 700px;
+    }
+
+    .features {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .feature {
+      background: var(--card);
+      margin: 1rem 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .feature-title {
+      padding: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s var(--ease);
+    }
+
+    .feature-title:hover {
+      background: rgba(255,94,30,0.1);
+    }
+
+    .feature-desc {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      background: rgba(255,94,30,0.05);
+      transition: all 0.8s var(--ease);
+      padding: 0 1.5rem;
+    }
+
+    .feature-desc.expanded {
+      max-height: 200px;
+      opacity: 1;
+      padding: 1.5rem;
+    }
+
+    .feature-desc p {
+      margin: 0;
+      color: var(--text-sec);
+      font-size: 1.1rem;
+    }
+
+    /* Section 7: Encerramento */
+    #encerramento {
+      background: linear-gradient(135deg, var(--primary-dark)20, var(--primary)40);
+    }
+
+    #encerramento h2 {
+      font-size: clamp(2rem, 8vw, 4rem);
+      font-weight: 800;
+      margin: 0 0 1rem;
+    }
+
+    #encerramento .subtitle {
+      font-size: 1.3rem;
+      color: var(--text-sec);
+      margin: 0 0 2rem;
+      max-width: 600px;
+    }
+
+    .cta-form {
+      display: flex;
+      max-width: 400px;
+      margin: 0 auto 2rem;
+      gap: 1rem;
+      flex-direction: column;
+    }
+
+    @media (min-width: 500px) {
+      .cta-form {
+        flex-direction: row;
+      }
+    }
+
+    .cta-form input {
+      flex: 1;
+      padding: 1.2rem;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 50px;
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+      backdrop-filter: blur(10px);
+    }
+
+    .cta-form input::placeholder {
+      color: var(--text-sec);
+    }
+
+    .fine-print {
+      font-size: 0.9rem;
+      color: var(--text-sec);
+      max-width: 500px;
+      margin: 1rem auto 0;
+    }
+
+    .footer {
+      padding: 2rem 1rem;
+      text-align: center;
+      border-top: 1px solid var(--card);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-size: 2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), #ff8e5e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 0.5rem;
+    }
+
+    .social {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-sec);
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    .insta-icon {
+      width: 24px;
+      height: 24px;
+      fill: var(--primary);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: #000;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.4s var(--ease);
+      z-index: 2000;
+    }
+
+    #toast.show {
+      bottom: 2rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .counter-container {
+        padding: 1rem;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        font-size: clamp(1rem, 3vw, 1.5rem);
+      }
+
+      .counter-value {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="counter-container">
+    <span class="counter-prefix">VOCÊ ESTÁ</span>
+    <span class="counter-status">PERDENDO</span>
+    <span class="counter-value" data-current="0">R$ 0</span>
+    <span class="counter-suffix">POR MÊS</span>
+  </div>
+
+  <section id="atentado">
+    <div class="phrases">
+      <h2 class="phrase">Você sabia que...</h2>
+      <h2 class="phrase">42% dos serviços agendados em oficinas mecânicas</h2>
+      <h2 class="phrase">NUNCA SÃO FATURADOS?</h2>
+    </div>
+  </section>
+
+  <section id="calculadora">
+    <div class="question" id="cars-q">
+      <h3>Quantos carros passam no seu mês?</h3>
+      <div class="options">
+        <button class="option-btn" data-cars="10-30">10-30</button>
+        <button class="option-btn" data-cars="30-60">30-60</button>
+        <button class="option-btn" data-cars="60-100">60-100</button>
+        <button class="option-btn" data-cars="100+">100+</button>
+      </div>
+    </div>
+    <div class="question" id="ticket-q">
+      <h3>Qual o ticket médio dos seus serviços?</h3>
+      <div class="options">
+        <button class="option-btn" data-ticket="150">R$ 150</button>
+        <button class="option-btn" data-ticket="300">R$ 300</button>
+        <button class="option-btn" data-ticket="500">R$ 500</button>
+        <button class="option-btn" data-ticket="800">R$ 800+</button>
+      </div>
+    </div>
+    <p class="teaser">E se eu te dissesse que isso pode mudar em 30 segundos?</p>
+  </section>
+
+  <section id="transicao">
+    <div class="chaos-container">
+      <div class="paper"></div>
+      <div class="paper"></div>
+      <div class="paper"></div>
+      <div class="paper"></div>
+    </div>
+  </section>
+
+  <section id="dashboard">
+    <div class="dashboard">
+      <div class="metrics">
+        <div class="metric">
+          <span class="metric-label">Receita</span>
+          <span class="metric-value" data-target="152340">R$ 0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">OS Fechadas</span>
+          <span class="metric-value" data-target="245">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Clientes</span>
+          <span class="metric-value" data-target="189">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Margem</span>
+          <span class="metric-value" data-target="32">0%</span>
+        </div>
+      </div>
+      <ul class="os-list">
+        <li class="os-item">OS #123 - Fiat Uno - Troca de óleo ✅</li>
+        <li class="os-item">OS #124 - VW Gol - Alinhamento ✅</li>
+        <li class="os-item">OS #125 - Honda Civic - Freios ✅</li>
+        <li class="os-item">OS #126 - Ford Ka - Revisão ✅</li>
+        <li class="os-item">OS #127 - Chevrolet Onix - Pneus ✅</li>
+      </ul>
+      <p class="live-text">Enquanto você lê isso, uma oficina está faturando com Graxo</p>
+      <button class="cta-btn" onclick="scrollToCTA()">QUERO MEU RESULTADO →</button>
+    </div>
+  </section>
+
+  <section id="prova-social">
+    <div class="testimonials">
+      <div class="testimonial">
+        <div class="avatar">RB</div>
+        <h4>Ricardo Bento</h4>
+        <p>Recuperei R$ 2.340 em inadimplência no primeiro mês</p>
+        <div class="mini-graph">
+          <div class="bar-group">
+            <div class="bar bar-before"></div>
+            <div class="bar bar-after"></div>
+          </div>
+          <span class="bar-label">Antes / Depois</span>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="avatar">CS</div>
+        <h4>Carlos Silva</h4>
+        <p>De 12 para 45 OS por mês</p>
+        <div class="mini-graph">
+          <div class="bar-group">
+            <div class="bar bar-before"></div>
+            <div class="bar bar-after"></div>
+          </div>
+          <span class="bar-label">Antes / Depois</span>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="avatar">JC</div>
+        <h4>Juliana Costa</h4>
+        <p>Margem de lucro subiu de 8% para 32%</p>
+        <div class="mini-graph">
+          <div class="bar-group">
+            <div class="bar bar-before"></div>
+            <div class="bar bar-after"></div>
+          </div>
+          <span class="bar-label">Antes / Depois</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="produto">
+    <ul class="features">
+      <li class="feature">
+        <div class="feature-title">OS que não deixam dinheiro na mesa</div>
+        <div class="feature-desc">
+          <p>Cada serviço vira cobrança. Cliente não escapa.</p>
+        </div>
+      </li>
+      <li class="feature">
+        <div class="feature-title">Clientes que não somem</div>
+        <div class="feature-desc">
+          <p>Telefone, placa, histórico. Tudo salvo. Nunca mais perca um contato.</p>
+        </div>
+      </li>
+      <li class="feature">
+        <div class="feature-title">Dinheiro que não se perde</div>
+        <div class="feature-desc">
+          <p>Dashboard em tempo real. Você vê cada real entrando e saindo.</p>
+        </div>
+      </li>
+      <li class="feature">
+        <div class="feature-title">Orçamentos em 30 segundos</div>
+        <div class="feature-desc">
+          <p>Preenche, envia no WhatsApp. Cliente aprova na hora.</p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section id="encerramento" id="cta">
+    <h2>Chega de perder dinheiro no escuro.</h2>
+    <p class="subtitle">Mais de 200 oficinas já pararam de perder dinheiro. A sua pode ser a próxima.</p>
+    <form class="cta-form" id="cta-form">
+      <input type="email" placeholder="Seu email para seu resultado" required>
+      <button type="submit" class="cta-btn">QUERO VER MEU RESULTADO →</button>
+    </form>
+    <p class="fine-print">Sem pegadinha. 14 dias grátis. Cancela quando quiser.</p>
+    <div class="footer">
+      <h1 class="logo">GRAXO</h1>
+      <p>Feito por quem ama oficina</p>
+      <a href="#" class="social" target="_blank">
+        <svg class="insta-icon" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        Instagram
+      </a>
+    </div>
+  </section>
+
+  <div id="toast">Email enviado! Veja seu resultado em instantes. 🚀</div>
+
+  <script>
+    // Car medias
+    const carMedias = {
+      '10-30': 20,
+      '30-60': 45,
+      '60-100': 80,
+      '100+': 130
+    };
+
+    let selectedCars = null;
+    let selectedTicket = null;
+    let currentLoss = 0;
+
+    // DOM elements
+    const counterValue = document.querySelector('.counter-value');
+    const counterStatus = document.querySelector('.counter-status');
+    const counterContainer = document.querySelector('.counter-container');
+    const phrases = document.querySelectorAll('.phrase');
+    const carBtns = document.querySelectorAll('[data-cars]');
+    const ticketBtns = document.querySelectorAll('[data-ticket]');
+    const form = document.getElementById('cta-form');
+    const toast = document.getElementById('toast');
+
+    // Animate phrases on load
+    phrases.forEach((phrase, i) => {
+      setTimeout(() => {
+        phrase.style.transition = '0.8s var(--ease)';
+        phrase.style.opacity = '1';
+        phrase.style.transform = 'scale(1) translateY(0)';
+      }, i * 1000 + 500);
+    });
+
+    // Calculator buttons
+    carBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        carBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCars = btn.dataset.cars;
+        updateLoss();
+      });
+    });
+
+    ticketBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        ticketBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTicket = parseInt(btn.dataset.ticket);
+        updateLoss();
+      });
+    });
+
+    function updateLoss() {
+      if (selectedCars && selectedTicket) {
+        currentLoss = carMedias[selectedCars] * selectedTicket * 0.42;
+        animateCounter(currentLoss, counterValue);
+      }
+    }
+
+    // Animate counter
+    function animateCounter(target, el = counterValue) {
+      const start = parseFloat(el.dataset.current || '0');
+      const duration = 1200;
+      const startTime = performance.now();
+
+      function step(time) {
+        const progress = Math.min((time - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+        const value = start + (target - start) * eased;
+        el.textContent = 'R$ ' + Math.floor(value).toLocaleString('pt-BR');
+        el.dataset.current = value;
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = 'R$ ' + Math.floor(target).toLocaleString('pt-BR');
+          el.dataset.current = target;
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+
+    // Scroll observers
+    const dashboardObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          document.body.classList.add('transformed');
+          counterContainer.classList.add('transformed');
+          counterStatus.textContent = 'RECUPERANDO';
+          animateCounter(currentLoss || 12600); // default example
+          chaosContainer.classList.add('organized');
+          animateMetrics();
+          animateOsList();
+          dashboardObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    const featureObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelector('.feature-desc').classList.add('expanded');
+        }
+      });
+    }, { threshold: 0.2 });
+
+    // Chaos container
+    const chaosContainer = document.querySelector('.chaos-container');
+
+    // Metrics animation
+    function animateMetrics() {
+      document.querySelectorAll('.metric-value').forEach(el => {
+        const target = parseFloat(el.dataset.target);
+        const isPercent = el.textContent.includes('%');
+        const animateEl = (val) => {
+          el.textContent = isPercent ? Math.floor(val) + '%' : 'R$ ' + Math.floor(val).toLocaleString('pt-BR');
+        };
+        animateCounter(target, { textContent: 0, animateEl });
+        // Simplified, use same animateCounter adapted
+        let start = 0;
+        const duration = 1500;
+        const startTime = performance.now();
+        function step(time) {
+          const p = Math.min((time - startTime)/duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          const val = start + (target - start) * eased;
+          if (isPercent) {
+            el.textContent = Math.floor(val) + '%';
+          } else {
+            el.textContent = 'R$ ' + Math.floor(val).toLocaleString('pt-BR');
+          }
+          if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+    }
+
+    // OS list stagger
+    function animateOsList() {
+      const items = document.querySelectorAll('.os-item');
+      items.forEach((item, i) => {
+        setTimeout(() => item.classList.add('animate'), i * 150);
+      });
+    }
+
+    // Observe dashboard
+    dashboardObserver.observe(document.getElementById('dashboard'));
+
+    // Observe features
+    document.querySelectorAll('.feature').forEach(feat => {
+      featureObserver.observe(feat);
+    });
+
+    // CTA scroll
+    function scrollToCTA() {
+      document.getElementById('encerramento').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Form submit
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = form.querySelector('input').value;
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+        form.reset();
+      }
+    });
+
+    // Bar heights for testimonials (static CSS pseudo, but enhance)
+    document.querySelectorAll('.bar-before').forEach((bar, i) => {
+      bar.style.height = i === 2 ? '25%' : '30%';
+    });
+    document.querySelectorAll('.bar-after').forEach(bar => {
+      bar.style.height = '85%';
+    });
+  </script>
+</body>
+</html>
